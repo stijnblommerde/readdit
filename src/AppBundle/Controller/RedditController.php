@@ -11,65 +11,24 @@ class RedditController extends Controller
     /**
      * @Route("/", name="list")
      */
-    public function indexAction()
+    public function listAction()
     {
         $posts = $this->getDoctrine()->getRepository('AppBundle\Entity\RedditPost')->findAll();
         return $this->render('reddit/index.html.twig', ['posts' => $posts]);
     }
 
     /**
-     * @Route("/create/{text}", name="create")
+     * @Route("/scraper", name="scraper")
      */
-    public function createAction($text)
+    public function scraperAction()
     {
-        // em = Entity Manager
-        $em = $this->getDoctrine()->getManager();
+        $result = $this->get('reddit_scraper')->scrape();
 
-        $post = new RedditPost();
-        $post->setTitle('Hello ' . $text);
+        dump($result);
 
-        $em->persist($post);
-        $em->flush();
-
-        return $this->redirectToRoute('list');
+        return $this->render('reddit/index.html.twig', []);
     }
 
-    /**
-     * @Route("/update/{id}/{text}", name="update")
-     */
-    public function updateAction($id, $text)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $post = $this->getDoctrine()->getRepository('AppBundle\Entity\RedditPost')->find($id);
 
-        if (!$post) {
-            throw $this->createNotFoundException(
-                'No post found for id ' . $id
-            );
-        }
-        $post->setTitle($text);
-        $em->flush();
-
-        return $this->redirectToRoute('list');
-    }
-
-    /**
-     * @Route("/delete/{id}", name="delete")
-     */
-    public function deleteAction($id)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $post = $this->getDoctrine()->getRepository('AppBundle\Entity\RedditPost')->find($id);
-
-        if (!$post) {
-            throw $this->createNotFoundException(
-                'No post found for id ' . $id
-            );
-        }
-        $em->remove($post);
-        $em->flush();
-
-        return $this->redirectToRoute('list');
-    }
 
 }
